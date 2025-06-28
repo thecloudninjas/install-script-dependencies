@@ -63,11 +63,12 @@ az version
 # --------------------
 # Install Terraform
 # --------------------
-echo "📦 Installing Terraform..."
+echo "📦 Installing Terraform via APT..."
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
   sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt update && sudo apt install -y terraform
+sudo apt-get update && sudo apt-get install -y terraform
 terraform -version
 
 # --------------------
@@ -94,10 +95,11 @@ eksctl version || echo "❌ eksctl install failed"
 # Install Google Cloud SDK (gcloud) via APT
 # --------------------
 echo "☁️ Installing gcloud CLI via APT..."
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
-  gpg --dearmor | sudo tee /usr/share/keyrings/cloud.google.gpg > /dev/null
+sudo apt update && sudo apt install -y apt-transport-https ca-certificates gnupg curl
 echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | \
   sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
+  gpg --dearmor | sudo tee /usr/share/keyrings/cloud.google.gpg > /dev/null
 sudo apt update && sudo apt install -y google-cloud-sdk
 gcloud version || echo "❌ gcloud install failed"
 
