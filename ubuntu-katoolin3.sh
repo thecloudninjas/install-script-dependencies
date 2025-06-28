@@ -137,9 +137,10 @@ zsh --version
 # --------------------
 echo "🐱 Installing Katoolin3 (Kali tools)..."
 git clone https://github.com/s-h-3-l-l/katoolin3.git
-cd katoolin3
+cd ~/katoolin3
+chmod +x katoolin3.py
+sudo ./katoolin3.py
 sudo python3 installer.py || echo "⚠️ Katoolin3 installer finished with warnings. Manual review may be required."
-sudo ln -s /usr/bin/katoolin3 /usr/local/bin/katoolin3
 katoolin3
 
 echo "✅ All tools (including Kali Linux tools via Katoolin3) installed successfully!"
