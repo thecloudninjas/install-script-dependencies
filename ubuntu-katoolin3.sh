@@ -24,7 +24,7 @@ sudo apt install -y \
 # Install kubectl
 # --------------------
 echo "🔧 Installing kubectl..."
-KUBECTL_VERSION=$(curl -s https://dl.k8s.io/release/stable.txt)
+KUBECTL_VERSION=$(curl -Ls https://dl.k8s.io/release/stable.txt)
 curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin/
