@@ -18,7 +18,11 @@ sudo apt install -y \
   zsh \
   python3 \
   python3-pip \
-  git
+  git \
+  snapd
+
+# Ensure snapd is active
+sudo systemctl enable --now snapd.socket
 
 # --------------------
 # Install kubectl
@@ -80,10 +84,10 @@ terraform -version
 # Install AWS CLI v2
 # --------------------
 echo "☁️ Installing AWS CLI v2..."
+cd /tmp
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
-rm -rf aws awscliv2.zip
+unzip -q awscliv2.zip
+sudo ./aws/install --update
 aws --version
 
 # --------------------
@@ -92,16 +96,14 @@ aws --version
 echo "☁️ Installing eksctl..."
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/eksctl /usr/local/bin
+sudo chmod +x /usr/local/bin/eksctl
 eksctl version
 
 # --------------------
 # Install Google Cloud SDK (gcloud)
 # --------------------
 echo "☁️ Installing gcloud CLI..."
-echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | \
-  sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-sudo apt update && sudo apt install -y google-cloud-sdk
+sudo snap install google-cloud-cli --classic
 gcloud version
 
 # --------------------
