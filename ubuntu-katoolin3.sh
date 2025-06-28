@@ -5,6 +5,12 @@ set -e
 echo "🔧 Updating system packages..."
 sudo apt update && sudo apt upgrade -y
 
+echo "📦 Installing base packages..."
+sudo apt install -y \
+  curl unzip gnupg ca-certificates lsb-release \
+  apt-transport-https software-properties-common \
+  jq zsh python3 python3-pip git snapd
+
 echo "📦 Installing common dependencies..."
 sudo apt install -y \
   curl \
@@ -85,33 +91,39 @@ terraform -version
 # --------------------
 echo "☁️ Installing AWS CLI v2..."
 cd /tmp
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip -q awscliv2.zip
-sudo ./aws/install --update
-aws --version
+sudo ./aws/install
+rm -rf aws awscliv2.zip
+aws --version || echo "❌ AWS CLI install failed"
 
 # --------------------
 # Install eksctl
 # --------------------
 echo "☁️ Installing eksctl..."
-curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+curl -s "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/eksctl /usr/local/bin
-sudo chmod +x /usr/local/bin/eksctl
-eksctl version
+chmod +x /usr/local/bin/eksctl
+eksctl version || echo "❌ eksctl install failed"
 
 # --------------------
 # Install Google Cloud SDK (gcloud)
 # --------------------
-echo "☁️ Installing gcloud CLI..."
 sudo snap install google-cloud-cli --classic
-gcloud version
+# Check if gcloud was installed successfully
+if command -v gcloud &> /dev/null; then
+    echo "✅ gcloud installed successfully"
+    gcloud version
+else
+    echo "❌ gcloud installation failed. Please check snap logs or permissions."
+fi
 
 # --------------------
 # Install yq
 # --------------------
 echo "🔍 Installing yq..."
 sudo snap install yq
-yq --version
+yq --version || echo "❌ yq install failed"
 
 # --------------------
 # Install Oh My Zsh
