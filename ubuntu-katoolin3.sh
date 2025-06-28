@@ -86,7 +86,7 @@ aws --version || echo "❌ AWS CLI install failed"
 # Install eksctl
 # --------------------
 echo "☁️ Installing eksctl..."
-curl -s "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+curl -sL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/eksctl /usr/local/bin
 chmod +x /usr/local/bin/eksctl
 eksctl version || echo "❌ eksctl install failed"
@@ -129,6 +129,7 @@ sudo apt install -y gnupg
 gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ED65462EC8D5E4C5
 gpg --export ED65462EC8D5E4C5 | sudo tee /etc/apt/trusted.gpg.d/kali.gpg > /dev/null
 sudo apt update
+katoolin3
 echo "✅ Katoolin3 installed. Run it using: katoolin3"
 
 # --------------------
