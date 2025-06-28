@@ -3,7 +3,7 @@
 set -e
 
 echo "🔧 Updating system packages..."
-sudo apt update && sudo apt upgrade -y
+sudo apt update && sudo apt upgrade && sudo apt install -y python3 git
 
 echo "📦 Installing base packages..."
 sudo apt install -y \
@@ -139,7 +139,7 @@ echo "🐱 Installing Katoolin3 (Kali tools)..."
 git clone https://github.com/s-h-3-l-l/katoolin3.git
 cd katoolin3
 sudo python3 installer.py || echo "⚠️ Katoolin3 installer finished with warnings. Manual review may be required."
-cd ..
-rm -rf katoolin3
+sudo ln -s /usr/bin/katoolin3 /usr/local/bin/katoolin3
+katoolin3
 
 echo "✅ All tools (including Kali Linux tools via Katoolin3) installed successfully!"
