@@ -5,6 +5,12 @@ set -e
 echo "🔧 Updating system packages..."
 sudo apt update && sudo apt upgrade -y
 
+echo "📦 Installing base packages..."
+sudo apt install -y \
+  curl unzip gnupg ca-certificates lsb-release \
+  apt-transport-https software-properties-common \
+  jq zsh python3 python3-pip git snapd
+
 echo "📦 Installing common dependencies..."
 sudo apt install -y \
   curl \
@@ -15,13 +21,20 @@ sudo apt install -y \
   lsb-release \
   software-properties-common \
   jq \
-  zsh
+  zsh \
+  python3 \
+  python3-pip \
+  git \
+  snapd
+
+# Ensure snapd is active
+sudo systemctl enable --now snapd.socket
 
 # --------------------
 # Install kubectl
 # --------------------
 echo "🔧 Installing kubectl..."
-KUBECTL_VERSION=$(curl -s https://dl.k8s.io/release/stable.txt)
+KUBECTL_VERSION=$(curl -Ls https://dl.k8s.io/release/stable.txt)
 curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin/
@@ -77,43 +90,47 @@ terraform -version
 # Install AWS CLI v2
 # --------------------
 echo "☁️ Installing AWS CLI v2..."
+cd /tmp
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
-sudo ./aws/install
-rm -rf aws awscliv2.zip
-aws --version
+sudo ./aws/install --update
+aws --version || echo "❌ AWS CLI install failed"
 
 # --------------------
 # Install eksctl
 # --------------------
 echo "☁️ Installing eksctl..."
-curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+curl -s "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/eksctl /usr/local/bin
-eksctl version
+chmod +x /usr/local/bin/eksctl
+eksctl version || echo "❌ eksctl install failed"
 
 # --------------------
 # Install Google Cloud SDK (gcloud)
 # --------------------
-echo "☁️ Installing gcloud CLI..."
-echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | \
-  sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-sudo apt update && sudo apt install -y google-cloud-sdk
-gcloud version
+sudo snap install google-cloud-cli --classic
+# Check if gcloud was installed successfully
+if command -v gcloud &> /dev/null; then
+    echo "✅ gcloud installed successfully"
+    gcloud version
+else
+    echo "❌ gcloud installation failed. Please check snap logs or permissions."
+fi
 
 # --------------------
 # Install yq
 # --------------------
 echo "🔍 Installing yq..."
 sudo snap install yq
-yq --version
+yq --version || echo "❌ yq install failed"
 
 # --------------------
-# Install Oh My Zsh (optional)
+# Install Oh My Zsh
 # --------------------
 echo "💻 Installing Oh My Zsh..."
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 chsh -s $(which zsh)
 zsh --version
+
 
 echo "✅ All tools installed successfully!"
