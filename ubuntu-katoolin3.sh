@@ -52,7 +52,7 @@ helm version
 # --------------------
 echo "🐳 Installing Docker..."
 sudo apt remove -y docker docker-engine docker.io containerd runc || true
-sudo install -m 0755 -d /etc/apt/keyrings
+sudo install -m 0755 -d /etc/apt/keyrings -y
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
@@ -135,12 +135,35 @@ zsh --version
 # --------------------
 # Install Katoolin3 for Kali Linux Tools
 # --------------------
-echo "🐱 Installing Katoolin3 (Kali tools)..."
-git clone https://github.com/s-h-3-l-l/katoolin3.git
-cd ~/katoolin3
-chmod +x katoolin3.py
-sudo ./katoolin3.py
-sudo python3 installer.py || echo "⚠️ Katoolin3 installer finished with warnings. Manual review may be required."
-katoolin3
+echo "🐱 Installing Katoolin3 (Kali Linux Tools Installer)..."
+
+# Step 1: Clone Katoolin3 repo
+git clone https://github.com/s-h-3-l-l/katoolin3.git ~/katoolin3
+
+# Step 2: Make the main script executable
+chmod +x ~/katoolin3/katoolin3.py
+
+# Step 3: Create a symbolic link for global use
+sudo ln -sf ~/katoolin3/katoolin3.py /usr/local/bin/katoolin3
+
+# Step 4: Install GnuPG if not already present
+sudo apt install -y gnupg
+
+# Step 5: Add Kali Linux signing key (choose one of the below)
+
+## Option A: For older systems using apt-key
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ED65462EC8D5E4C5 || true
+
+## Option B: Recommended for Ubuntu 22.04+ (modern approach)
+gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ED65462EC8D5E4C5
+gpg --export ED65462EC8D5E4C5 | sudo tee /etc/apt/trusted.gpg.d/kali.gpg > /dev/null
+
+# Step 6: Update apt repositories
+sudo apt update
+
+# Step 7: Print success message
+echo "✅ Katoolin3 installed. Run it using: katoolin3"
+
+
 
 echo "✅ All tools (including Kali Linux tools via Katoolin3) installed successfully!"
