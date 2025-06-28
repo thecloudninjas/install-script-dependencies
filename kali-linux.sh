@@ -91,6 +91,8 @@ echo "⚠️ Please reboot or re-login to apply group membership changes (e.g., 
 
 #sudo apt update && sudo apt install -y kali-linux-large 📌
 
+#sudo apt install -y kali-linux-everything --ignore-missing
+
 #sudo apt install -y kali-linux-everything
 
 
