@@ -89,6 +89,8 @@ echo "⚠️ Please reboot or re-login to apply group membership changes (e.g., 
 #You can run this safely on a clean Kali install.
 #If you're okay with downloading 10GB+ tools:
 
+#sudo apt update && sudo apt install -y kali-linux-large 📌
+
 #sudo apt install -y kali-linux-everything
 
 
