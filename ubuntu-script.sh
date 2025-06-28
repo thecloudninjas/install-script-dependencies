@@ -5,27 +5,11 @@ set -e
 echo "🔧 Updating system packages..."
 sudo apt update && sudo apt upgrade -y
 
-echo "📦 Installing base packages..."
+echo "📦 Installing base dependencies..."
 sudo apt install -y \
   curl unzip gnupg ca-certificates lsb-release \
   apt-transport-https software-properties-common \
   jq zsh python3 python3-pip git snapd
-
-echo "📦 Installing common dependencies..."
-sudo apt install -y \
-  curl \
-  unzip \
-  gnupg \
-  ca-certificates \
-  apt-transport-https \
-  lsb-release \
-  software-properties-common \
-  jq \
-  zsh \
-  python3 \
-  python3-pip \
-  git \
-  snapd
 
 # Ensure snapd is active
 sudo systemctl enable --now snapd.socket
@@ -52,7 +36,7 @@ helm version
 # --------------------
 echo "🐳 Installing Docker..."
 sudo apt remove -y docker docker-engine docker.io containerd runc || true
-sudo install -m 0755 -d /etc/apt/keyrings
+sudo install -m 0755 -d /etc/apt/keyrings -y
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
@@ -79,11 +63,12 @@ az version
 # --------------------
 # Install Terraform
 # --------------------
-echo "📦 Installing Terraform..."
+echo "📦 Installing Terraform via APT..."
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
   sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt update && sudo apt install -y terraform
+sudo apt-get update && sudo apt-get install -y terraform
 terraform -version
 
 # --------------------
@@ -94,34 +79,39 @@ cd /tmp
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install --update
+export PATH=$PATH:/usr/local/bin
 aws --version || echo "❌ AWS CLI install failed"
 
 # --------------------
 # Install eksctl
 # --------------------
 echo "☁️ Installing eksctl..."
-curl -s "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+curl -sL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/eksctl /usr/local/bin
 chmod +x /usr/local/bin/eksctl
 eksctl version || echo "❌ eksctl install failed"
 
 # --------------------
-# Install Google Cloud SDK (gcloud)
+# Install Google Cloud SDK (gcloud) via APT
 # --------------------
-sudo snap install google-cloud-cli --classic
-# Check if gcloud was installed successfully
-if command -v gcloud &> /dev/null; then
-    echo "✅ gcloud installed successfully"
-    gcloud version
-else
-    echo "❌ gcloud installation failed. Please check snap logs or permissions."
-fi
+echo "☁️ Installing gcloud CLI via APT..."
+sudo apt update && sudo apt install -y apt-transport-https ca-certificates gnupg curl
+
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | \
+  sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+  
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
+  gpg --dearmor | sudo tee /usr/share/keyrings/cloud.google.gpg > /dev/null
+  
+sudo apt update && sudo apt install -y google-cloud-sdk
+
+gcloud version || echo "❌ gcloud install failed"
 
 # --------------------
 # Install yq
 # --------------------
 echo "🔍 Installing yq..."
-sudo snap install yq
+sudo apt install -y yq
 yq --version || echo "❌ yq install failed"
 
 # --------------------
@@ -132,5 +122,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 chsh -s $(which zsh)
 zsh --version
 
-
-echo "✅ All tools installed successfully!"
+# --------------------
+# Final Message
+# --------------------
+echo "🎉 All tools installed successfully!"
