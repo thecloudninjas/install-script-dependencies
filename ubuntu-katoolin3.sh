@@ -80,10 +80,15 @@ az version
 # Install Terraform
 # --------------------
 echo "📦 Installing Terraform..."
+# Install via APT (official and stable)
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
   sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt update && sudo apt install -y terraform
+
+sudo apt-get update && sudo apt-get install -y terraform
+# ✅ Verify
 terraform -version
 
 # --------------------
@@ -106,22 +111,33 @@ chmod +x /usr/local/bin/eksctl
 eksctl version || echo "❌ eksctl install failed"
 
 # --------------------
-# Install Google Cloud SDK (gcloud)
+# Install Google Cloud SDK (gcloud) via APT
 # --------------------
-sudo snap install google-cloud-cli --classic
-# Check if gcloud was installed successfully
-if command -v gcloud &> /dev/null; then
-    echo "✅ gcloud installed successfully"
-    gcloud version
-else
-    echo "❌ gcloud installation failed. Please check snap logs or permissions."
-fi
+echo "☁️ Installing gcloud CLI via APT..."
+
+# Install transport and GPG tools
+sudo apt update && sudo apt install -y apt-transport-https ca-certificates gnupg curl
+
+# Add Google Cloud's APT repository
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | \
+  sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+
+# Import the GPG key
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
+  gpg --dearmor | sudo tee /usr/share/keyrings/cloud.google.gpg > /dev/null
+
+# Install the gcloud CLI
+sudo apt update && sudo apt install -y google-cloud-sdk
+
+# Verify the installation
+gcloud version
+
 
 # --------------------
 # Install yq
 # --------------------
 echo "🔍 Installing yq..."
-sudo snap install yq
+sudo apt install yq -y
 yq --version || echo "❌ yq install failed"
 
 # --------------------
